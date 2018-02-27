@@ -11,7 +11,7 @@ namespace DbScan
 
         public IDistanceMeasure DistanceMeasure { get { return this.measure; } }
 
-        public Clusterer(IDistanceMeasure measure) { this.measure = measure; }
+        protected Clusterer(IDistanceMeasure measure) { this.measure = measure; }
         public abstract IEnumerable<Cluster<T>> Cluster(IEnumerable<T> points);
 
         protected double Distance(IClusterable a, IClusterable b)

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -5,7 +6,7 @@ using System.Linq;
 namespace DbScan
 {
     [DebuggerDisplay("{points[0]}, {points[1]}")]
-    public class DoublePoint : IClusterable
+    public sealed class DoublePoint : IClusterable, IEquatable<DoublePoint>
     {
         private readonly double[] points;
 
@@ -14,9 +15,10 @@ namespace DbScan
 
         public override int GetHashCode() => this.points.GetHashCode();
 
-        public override bool Equals(object obj)
+        public override bool Equals(object obj) => Equals(obj as DoublePoint);
+
+        public bool Equals(DoublePoint other)
         {
-            var other = obj as DoublePoint;
             if (other == null)
                 return false;
             if (ReferenceEquals(this, other))
