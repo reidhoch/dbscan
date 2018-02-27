@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using DbScan.Distance;
 
 namespace DbScan
 {
-    public class DBScanClusterer<T> where T : IClusterable
+    public class DBScanClusterer<T> : Clusterer<T> where T : IClusterable
     {
         private enum PointStatus
         {
@@ -15,8 +16,12 @@ namespace DbScan
         public double Epsilon { private set; get; }
         public int MinPts { private set; get; }
 
-        public DBScanClusterer(double epsilon, int minPts)
+        public DBScanClusterer(double epsilon, int minPts) : this(epsilon, minPts, new EuclideanDistance()) {
+        }
+
+        public DBScanClusterer(double epsilon, int minPts, IDistanceMeasure measure) : base(measure)
         {
+
             if (epsilon < 0.0d)
             {
                 throw new ArgumentOutOfRangeException("epsilon", epsilon, "Argument must be greather than 0.0");
@@ -30,7 +35,7 @@ namespace DbScan
             this.MinPts = minPts;
         }
 
-        public IEnumerable<Cluster<T>> Cluster(IEnumerable<T> points)
+        public override IEnumerable<Cluster<T>> Cluster(IEnumerable<T> points)
         {
             if (null == points)
             {
@@ -79,7 +84,7 @@ namespace DbScan
                     var currentNeghbors = GetNeighbors(current, points);
                     if (currentNeghbors.Count >= MinPts)
                     {
-                        seeds = merge(seeds, currentNeghbors);
+                        seeds = Merge(seeds, currentNeghbors);
                     }
                 }
                 if (status != PointStatus.PartOfCluster)
@@ -99,26 +104,13 @@ namespace DbScan
             {
                 if (point.Equals(neighbor))
                     continue;
-                if (distance(point, neighbor) <= Epsilon)
+                if (Distance(point, neighbor) <= Epsilon)
                     neighbors.Add(neighbor);
             }
             return neighbors;
         }
 
-        private double distance(T one, T two)
-        {
-            var p1 = one.GetPoints();
-            var p2 = two.GetPoints();
-            var dim = Math.Min(p1.Length, p2.Length);
-            var result = 0.0d;
-            for (var i = 0; i < dim; i++)
-            {
-                result += Math.Abs(p1[i] - p2[i]);
-            }
-            return result;
-        }
-
-        private IList<T> merge(IList<T> one, IList<T> two)
+        private IList<T> Merge(IList<T> one, IList<T> two)
         {
             var setOne = new HashSet<T>(one);
             var setTwo = new HashSet<T>(two);
