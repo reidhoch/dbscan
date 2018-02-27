@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+
 namespace DbScan
 {
     public class DBScanClusterer<T> where T : IClusterable
@@ -120,11 +121,6 @@ namespace DbScan
         private IList<T> merge(IList<T> one, IList<T> two)
         {
             var setOne = new HashSet<T>(one);
-            // foreach(var item in two){
-            //     if(!setOne.Contains(item))
-            //         one.Add(item);
-            // }
-            // return one;
             var setTwo = new HashSet<T>(two);
 
             setOne.UnionWith(setTwo);
