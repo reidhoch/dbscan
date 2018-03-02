@@ -1,4 +1,4 @@
-namespace DbScan
+﻿namespace DbScan
 {
     using System;
     using System.Collections.Generic;

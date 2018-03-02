@@ -1,4 +1,4 @@
-namespace DbScan.Distance
+﻿namespace DbScan.Distance
 {
     using System;
     using System.Collections.Generic;
