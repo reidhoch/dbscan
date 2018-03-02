@@ -1,16 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Xunit;
-
-namespace DbScan.Tests
+﻿namespace DbScan.Tests
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using Xunit;
+
     public class DbScanClustererTests
     {
         [Fact]
         public void ClusterTest()
         {
-            var points = new DoublePoint[]{
+            var points = new DoublePoint[]
+            {
                 new DoublePoint(new double[] { 83.08303244924173, 58.83387754182331 }),
                 new DoublePoint(new double[] { 45.05445510940626, 23.469642649637535 }),
                 new DoublePoint(new double[] { 14.96417921432294, 69.0264096390456 }),
@@ -73,7 +74,7 @@ namespace DbScan.Tests
                 new DoublePoint(new double[] { 29.004155302187428, 14.089665298582986 }),
                 new DoublePoint(new double[] { 29.339624439831823, 13.29096065578051 }),
                 new DoublePoint(new double[] { 30.997460327576846, 14.551914158277214 }),
-                new DoublePoint(new double[] { 30.66784126125276, 16.269703107886016 })
+                new DoublePoint(new double[] { 30.66784126125276, 16.269703107886016 }),
             };
 
             var transformer = new DBScanClusterer<DoublePoint>(2.0, 5);
@@ -81,16 +82,30 @@ namespace DbScan.Tests
 
             Assert.Equal(3, clusters.Count());
 
-            var clusterOne = new List<DoublePoint>(new[] {points[3], points[4], points[5], points[6], points[7], points[8], points[9], points[10],
-                              points[11], points[12], points[13], points[14]});
-            var clusterTwo = new List<DoublePoint>(new[]{points[15], points[16], points[17], points[18], points[19], points[20], points[21],
-                              points[22], points[23], points[24], points[25], points[26], points[27], points[28],
-                              points[29], points[30], points[31], points[32], points[33], points[34], points[35],
-                              points[36], points[37], points[38]});
-            var clusterThree = new List<DoublePoint>(new[] {points[39], points[40], points[41], points[42], points[43], points[44], points[45],
-                              points[46], points[47], points[48], points[49], points[50], points[51], points[52],
-                              points[53], points[54], points[55], points[56], points[57], points[58], points[59],
-                              points[60], points[61], points[62]});
+            var clusterOne = new List<DoublePoint>(new[]
+                            {
+                              points[3], points[4], points[5], points[6],
+                              points[7], points[8], points[9], points[10],
+                              points[11], points[12], points[13], points[14],
+                            });
+            var clusterTwo = new List<DoublePoint>(new[]
+                            {
+                              points[15], points[16], points[17], points[18],
+                              points[19], points[20], points[21], points[22],
+                              points[23], points[24], points[25], points[26],
+                              points[27], points[28], points[29], points[30],
+                              points[31], points[32], points[33], points[34],
+                              points[35], points[36], points[37], points[38],
+                            });
+            var clusterThree = new List<DoublePoint>(new[]
+                            {
+                                points[39], points[40], points[41], points[42],
+                                points[43], points[44], points[45], points[46],
+                                points[47], points[48], points[49], points[50],
+                                points[51], points[52], points[53], points[54],
+                                points[55], points[56], points[57], points[58],
+                                points[59], points[60], points[61], points[62],
+                            });
             bool cluster1Found = false;
             bool cluster2Found = false;
             bool cluster3Found = false;
@@ -100,15 +115,18 @@ namespace DbScan.Tests
                 {
                     cluster1Found = true;
                 }
+
                 if (cluster.Points.All(point => clusterTwo.Contains(point)))
                 {
                     cluster2Found = true;
                 }
+
                 if (cluster.Points.All(point => clusterThree.Contains(point)))
                 {
                     cluster3Found = true;
                 }
             }
+
             Assert.True(cluster1Found);
             Assert.True(cluster2Found);
             Assert.True(cluster3Found);
@@ -117,17 +135,18 @@ namespace DbScan.Tests
         [Fact]
         public void SingleLinkTest()
         {
-            var points = new DoublePoint[] {
-                new DoublePoint(new double[] {10, 10}), // A
-                new DoublePoint(new double[] {12, 9}),
-                new DoublePoint(new double[] {10, 8}),
-                new DoublePoint(new double[] {8, 8}),
-                new DoublePoint(new double[] {8, 6}),
-                new DoublePoint(new double[] {7, 7}),
-                new DoublePoint(new double[] {5, 6}),  // B
-                new DoublePoint(new double[] {14, 8}), // C
-                new DoublePoint(new double[] {7, 15}), // N - Noise, should not be present
-                new DoublePoint(new double[] {17, 8}), // D - single-link connected to C should not be present
+            var points = new DoublePoint[]
+            {
+                new DoublePoint(new double[] { 10, 10 }), // A
+                new DoublePoint(new double[] { 12, 9 }),
+                new DoublePoint(new double[] { 10, 8 }),
+                new DoublePoint(new double[] { 8, 8 }),
+                new DoublePoint(new double[] { 8, 6 }),
+                new DoublePoint(new double[] { 7, 7 }),
+                new DoublePoint(new double[] { 5, 6 }),  // B
+                new DoublePoint(new double[] { 14, 8 }), // C
+                new DoublePoint(new double[] { 7, 15 }), // N - Noise, should not be present
+                new DoublePoint(new double[] { 17, 8 }), // D - single-link connected to C should not be present
             };
 
             var clusterer = new DBScanClusterer<DoublePoint>(3, 3);
@@ -136,10 +155,13 @@ namespace DbScan.Tests
             Assert.Single(clusters);
 
             var clusterFound = false;
-            var clusterOne = new List<DoublePoint>(new[] { points[0], points[1],
-                                                           points[2], points[3],
-                                                           points[4], points[5],
-                                                           points[6], points[7]});
+            var clusterOne = new List<DoublePoint>(new[]
+                                                {
+                                                    points[0], points[1],
+                                                    points[2], points[3],
+                                                    points[4], points[5],
+                                                    points[6], points[7],
+                                                });
             foreach (var cluster in clusters)
             {
                 if (cluster.Points.All(point => clusterOne.Contains(point)))
@@ -147,8 +169,8 @@ namespace DbScan.Tests
                     clusterFound = true;
                 }
             }
-            Assert.True(clusterFound);
 
+            Assert.True(clusterFound);
         }
 
         [Fact]
