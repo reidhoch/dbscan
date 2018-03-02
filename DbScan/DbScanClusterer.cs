@@ -1,31 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using DbScan.Distance;
-
-namespace DbScan
+﻿namespace DbScan
 {
-    public class DBScanClusterer<T> : Clusterer<T> where T : IClusterable
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using DbScan.Distance;
+
+    public class DBScanClusterer<T> : Clusterer<T>
+    where T : IClusterable
     {
-        private enum PointStatus
+        public DBScanClusterer(double epsilon, int minPts)
+            : this(epsilon, minPts, new EuclideanDistance())
         {
-            Noise,
-            PartOfCluster
         }
 
-        public double Epsilon { private set; get; }
-        public int MinPts { private set; get; }
-
-        public DBScanClusterer(double epsilon, int minPts) : this(epsilon, minPts, new EuclideanDistance()) {
-        }
-
-        public DBScanClusterer(double epsilon, int minPts, IDistanceMeasure measure) : base(measure)
+        public DBScanClusterer(double epsilon, int minPts, IDistanceMeasure measure)
+            : base(measure)
         {
-
             if (epsilon < 0.0d)
             {
                 throw new ArgumentOutOfRangeException("epsilon", epsilon, "Argument must be greather than 0.0");
             }
+
             if (minPts < 0)
             {
                 throw new ArgumentOutOfRangeException("minPts", minPts, "Argument must be greather than 0.0");
@@ -35,39 +30,54 @@ namespace DbScan
             this.MinPts = minPts;
         }
 
+        private enum PointStatus
+        {
+            Noise,
+            PartOfCluster,
+        }
+
+        public double Epsilon { get; private set; }
+
+        public int MinPts { get; private set; }
+
         public override IEnumerable<Cluster<T>> Cluster(IEnumerable<T> points)
         {
-            if (null == points)
+            if (points == null)
             {
                 throw new ArgumentNullException("points");
             }
+
             var clusters = new List<Cluster<T>>();
             var visited = new Dictionary<IClusterable, PointStatus>();
 
             foreach (var point in points)
             {
                 if (visited.ContainsKey(point))
+                {
                     continue;
-                var neighbors = GetNeighbors(point, points);
-                if (neighbors.Count >= MinPts)
+                }
+
+                var neighbors = this.GetNeighbors(point, points);
+                if (neighbors.Count >= this.MinPts)
                 {
                     var cluster = new Cluster<T>();
-                    clusters.Add(ExpandCluster(cluster, point, neighbors, points, visited));
+                    clusters.Add(this.ExpandCluster(cluster, point, neighbors, points, visited));
                 }
                 else
                 {
                     visited[point] = PointStatus.Noise;
                 }
-
             }
+
             return clusters;
         }
 
-        private Cluster<T> ExpandCluster(Cluster<T> cluster,
-                                         T point,
-                                         IList<T> neighbors,
-                                         IEnumerable<T> points,
-                                         Dictionary<IClusterable, PointStatus> visited)
+        private Cluster<T> ExpandCluster(
+            Cluster<T> cluster,
+            T point,
+            IList<T> neighbors,
+            IEnumerable<T> points,
+            IDictionary<IClusterable, PointStatus> visited)
         {
             cluster.Points.Add(point);
             visited[point] = PointStatus.PartOfCluster;
@@ -81,19 +91,22 @@ namespace DbScan
 
                 if (!visited.ContainsKey(current))
                 {
-                    var currentNeghbors = GetNeighbors(current, points);
-                    if (currentNeghbors.Count >= MinPts)
+                    var currentNeghbors = this.GetNeighbors(current, points);
+                    if (currentNeghbors.Count >= this.MinPts)
                     {
-                        seeds = Merge(seeds, currentNeghbors);
+                        seeds = this.Merge(seeds, currentNeghbors);
                     }
                 }
+
                 if (status != PointStatus.PartOfCluster)
                 {
                     visited[current] = PointStatus.PartOfCluster;
                     cluster.Points.Add(current);
                 }
+
                 index++;
             }
+
             return cluster;
         }
 
@@ -103,10 +116,16 @@ namespace DbScan
             foreach (var neighbor in points)
             {
                 if (point.Equals(neighbor))
+                {
                     continue;
-                if (Distance(point, neighbor) <= Epsilon)
+                }
+
+                if (this.Distance(point, neighbor) <= this.Epsilon)
+                {
                     neighbors.Add(neighbor);
+                }
             }
+
             return neighbors;
         }
 
