@@ -4,23 +4,15 @@
     using System.Collections.Generic;
     using System.Linq;
     using DbScan.Distance;
+    using MathNet.Numerics;
+    using MathNet.Numerics.LinearAlgebra;
 
-    public class EuclideanDistance : IDistanceMeasure
+    public class EuclideanDistance<T> : IDistanceMeasure<T>
+    where T : struct, IEquatable<T>, IFormattable
     {
-        public double Compute(double[] a, double[] b)
+        public double Compute(Vector<T> a, Vector<T> b)
         {
-            if (a.Length != b.Length)
-            {
-                throw new ArgumentException("Dimension mismatch", "a");
-            }
-
-            var result = 0.0d;
-            for (var i = 0; i < a.Length; i++)
-            {
-                result += Math.Abs(a[i] - b[i]);
-            }
-
-            return result;
+            return Distance.Euclidean(a, b);
         }
     }
 }

@@ -4,16 +4,17 @@
     using System.Collections.Generic;
     using System.Linq;
     using DbScan.Distance;
+    using MathNet.Numerics.LinearAlgebra;
 
     public class DBScanClusterer<T> : Clusterer<T>
-    where T : IClusterable
+    where T : struct, IEquatable<T>, IFormattable
     {
         public DBScanClusterer(double epsilon, int minPts)
-            : this(epsilon, minPts, new EuclideanDistance())
+            : this(epsilon, minPts, new EuclideanDistance<T>())
         {
         }
 
-        public DBScanClusterer(double epsilon, int minPts, IDistanceMeasure measure)
+        public DBScanClusterer(double epsilon, int minPts, IDistanceMeasure<T> measure)
             : base(measure)
         {
             if (epsilon < 0.0d)
@@ -40,7 +41,7 @@
 
         public int MinPts { get; private set; }
 
-        public override IEnumerable<Cluster<T>> Cluster(IEnumerable<T> points)
+        public override IEnumerable<Cluster<T>> Cluster(IEnumerable<Vector<T>> points)
         {
             if (points == null)
             {
@@ -48,7 +49,7 @@
             }
 
             var clusters = new List<Cluster<T>>();
-            var visited = new Dictionary<IClusterable, PointStatus>();
+            var visited = new Dictionary<Vector<T>, PointStatus>();
 
             foreach (var point in points)
             {
@@ -74,15 +75,15 @@
 
         private Cluster<T> ExpandCluster(
             Cluster<T> cluster,
-            T point,
-            IList<T> neighbors,
-            IEnumerable<T> points,
-            IDictionary<IClusterable, PointStatus> visited)
+            Vector<T> point,
+            IList<Vector<T>> neighbors,
+            IEnumerable<Vector<T>> points,
+            IDictionary<Vector<T>, PointStatus> visited)
         {
             cluster.Points.Add(point);
             visited[point] = PointStatus.PartOfCluster;
 
-            IList<T> seeds = new List<T>(neighbors);
+            IList<Vector<T>> seeds = new List<Vector<T>>(neighbors);
             var index = 0;
             while (index < seeds.Count)
             {
@@ -110,9 +111,9 @@
             return cluster;
         }
 
-        private IList<T> GetNeighbors(T point, IEnumerable<T> points)
+        private IList<Vector<T>> GetNeighbors(Vector<T> point, IEnumerable<Vector<T>> points)
         {
-            var neighbors = new List<T>();
+            var neighbors = new List<Vector<T>>();
             foreach (var neighbor in points)
             {
                 if (point.Equals(neighbor))
@@ -129,13 +130,13 @@
             return neighbors;
         }
 
-        private IList<T> Merge(IList<T> one, IList<T> two)
+        private IList<Vector<T>> Merge(IList<Vector<T>> one, IList<Vector<T>> two)
         {
-            var setOne = new HashSet<T>(one);
-            var setTwo = new HashSet<T>(two);
+            var setOne = new HashSet<Vector<T>>(one);
+            var setTwo = new HashSet<Vector<T>>(two);
 
             setOne.UnionWith(setTwo);
-            return new List<T>(setOne);
+            return new List<Vector<T>>(setOne);
         }
     }
 }
