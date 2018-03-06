@@ -1,4 +1,4 @@
-namespace DbScan
+﻿namespace DbScan
 {
     public interface IClusterable
     {
