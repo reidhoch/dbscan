@@ -3,15 +3,16 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using MathNet.Numerics.LinearAlgebra;
 
     public sealed class Cluster<T> : IEquatable<Cluster<T>>
-    where T : IClusterable
+    where T : struct, IEquatable<T>, IFormattable
     {
-        private readonly IList<T> points;
+        private readonly IList<Vector<T>> points;
 
-        public Cluster() => this.points = new List<T>();
+        public Cluster() => this.points = new List<Vector<T>>();
 
-        public IList<T> Points
+        public IList<Vector<T>> Points
         {
             get
             {
@@ -21,7 +22,7 @@
 
         public override int GetHashCode() => this.points.GetHashCode();
 
-        public override bool Equals(object obj) => this.Equals(obj as DoublePoint);
+        public override bool Equals(object obj) => this.Equals(obj as Cluster<T>);
 
         public bool Equals(Cluster<T> other)
         {
