@@ -1,4 +1,4 @@
-﻿#! /bin/bash
+#!/bin/bash
 
 if [ ! -z $1 ]; then
   if [ $1 -lt 0 ] || [ $1 -gt 100 ]; then
