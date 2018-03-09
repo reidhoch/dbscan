@@ -20,7 +20,15 @@
             }
         }
 
-        public override int GetHashCode() => this.points.GetHashCode();
+        public override int GetHashCode()
+        {
+            int result = 37;
+            foreach (var point in this.Points)
+            {
+                result += (13 * result) + (point == null ? 0 : point.GetHashCode());
+            }
+            return result;
+        }
 
         public override bool Equals(object obj) => this.Equals(obj as Cluster<T>);
 
