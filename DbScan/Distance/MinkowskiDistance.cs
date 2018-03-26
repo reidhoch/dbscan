@@ -19,6 +19,16 @@
 
         public MinkowskiDistance(double p)
         {
+            if (p < 0d)
+            {
+                throw new ArgumentOutOfRangeException(nameof(p));
+            }
+
+            if (double.IsNaN(p))
+            {
+                throw new ArgumentOutOfRangeException(nameof(p), p, "NaN is not an acceptable value");
+            }
+
             this.p = p;
         }
 
