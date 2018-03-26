@@ -11,7 +11,15 @@
     {
         private readonly IDistanceMeasure<T> measure;
 
-        protected Clusterer(IDistanceMeasure<T> measure) => this.measure = measure;
+        protected Clusterer(IDistanceMeasure<T> measure)
+        {
+            if (measure == null)
+            {
+                throw new ArgumentNullException(nameof(measure));
+            }
+
+            this.measure = measure;
+        }
 
         public IDistanceMeasure<T> DistanceMeasure
         {

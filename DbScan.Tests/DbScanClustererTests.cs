@@ -205,5 +205,11 @@
         {
             Assert.Throws<ArgumentNullException>(() => new DBScanClusterer<double>(2.0, 5).Cluster(null));
         }
+
+        [Fact]
+        public void NullDistanceMeasureTest()
+        {
+            Assert.Throws<ArgumentNullException>(() => new DBScanClusterer<double>(2.0, 5, null));
+        }
     }
 }

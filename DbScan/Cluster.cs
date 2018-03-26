@@ -27,6 +27,7 @@
             {
                 result += (13 * result) + (point == null ? 0 : point.GetHashCode());
             }
+
             return result;
         }
 
